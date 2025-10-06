@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EduHogar · Prototipo MVP</title>
+  <style>
+    /* ====== Reset & Base ====== */
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif;background:#0f1220;color:#eef2ff}
+    a{color:inherit;text-decoration:none}
+    button{cursor:pointer;border:0;padding:.75rem 1rem;border-radius:12px;font-weight:600}
+    .btn{background:#5b7cfa;color:#fff;box-shadow:0 6px 16px rgba(91,124,250,.3)}
+    .btn.secondary{background:#1f2442}
+    .btn.ghost{background:transparent;border:2px solid #5b7cfa;color:#5b7cfa}
+    .pill{display:inline-block;background:#1f2442;border:1px solid #30375f;border-radius:999px;padding:.35rem .7rem;font-size:.8rem;color:#c9d2ff}
+    h1,h2,h3{margin:.4rem 0}
+    .muted{color:#a8b2e6}
+    .ok{color:#8ef0a7}
+    .warn{color:#ffd36a}
+    /* ====== Layout ====== */
+    header{position:sticky;top:0;z-index:20;background:#121531;border-bottom:1px solid #262b54}
+    .nav{display:flex;gap:.5rem;padding:.5rem;max-width:1000px;margin:0 auto;align-items:center;justify-content:space-between}
+    .tabs{display:flex;gap:.5rem;flex-wrap:wrap}
+    .logo{display:flex;align-items:center;gap:.6rem}
+    .logo .mark{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,#5b7cfa,#9a6bff);display:grid;place-items:center;font-weight:900}
+    main{max-width:1000px;margin:0 auto;padding:1rem;display:grid;gap:1rem}
+    .card{background:#121531;border:1px solid #262b54;border-radius:20px;padding:1rem;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+    .grid{display:grid;gap:1rem}
+    @media(min-width:840px){.grid.cols-2{grid-template-columns:1fr 1fr}}
+    .row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+    .spaced{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+    .hidden{display:none !important}
+    .progress{height:12px;background:#1f2442;border-radius:999px;overflow:hidden;border:1px solid #30375f}
+    .progress > div{height:100%;background:linear-gradient(90deg,#8ef0a7,#5b7cfa);width:0%}
+    .list{display:grid;gap:.6rem}
+    .list .item{display:flex;justify-content:space-between;align-items:center;background:#0f1220;border:1px solid #262b54;border-radius:14px;padding:.6rem .8rem}
+    .tag{font-size:.75rem;padding:.25rem .5rem;border-radius:8px;background:#1c203f;border:1px solid #30375f;color:#c9d2ff}
+    .kpi{font-weight:800}
+    .small{font-size:.9rem}
+    .timer{font-size:3rem;font-weight:900;letter-spacing:.04em}
+    .avatar{width:40px;height:40px;border-radius:12px;background:#1f2442;border:1px solid #30375f;display:grid;place-items:center}
+    .section-title{display:flex;align-items:center;gap:.6rem}
+    .badge{padding:.4rem .7rem;border-radius:999px;background:#182043;border:1px solid #2b3470;color:#b8c4ff;font-size:.8rem}
+    .store-item{display:flex;gap:.8rem;align-items:center;background:#0f1220;border:1px solid #262b54;border-radius:14px;padding:.6rem .8rem}
+    .store-item img{width:40px;height:40px;border-radius:12px;border:1px solid #262b54;background:#121531}
+    .checkbox{transform:scale(1.2)}
+    .mono{font-family: ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav">
+      <div class="logo">
+        <div class="mark">EH</div><strong>EduHogar · Piloto</strong>
+      </div>
+      <div class="tabs">
+        <button class="btn ghost" data-route="home">Inicio</button>
+        <button class="btn ghost" data-route="onboarding">Onboarding</button>
+        <button class="btn ghost" data-route="training">Entrenamiento</button>
+        <button class="btn ghost" data-route="missions">Misiones</button>
+        <button class="btn ghost" data-route="prep">Prep Boss</button>
+        <button class="btn ghost" data-route="boss">Boss</button>
+        <button class="btn ghost" data-route="campfire">Fogata</button>
+        <button class="btn ghost" data-route="store">Tienda</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="card">
+      <div class="spaced">
+        <div class="section-title">
+          <h2>Bienvenido 👋</h2><span class="badge" id="seasonName">Season 0 · La Niebla del Pasillo 3</span>
+        </div>
+        <div class="row">
+          <div class="avatar" id="avatar">🙂</div>
+          <div>
+            <div class="small muted">Aprendiz</div>
+            <strong id="studentName">Sin nombre</strong>
+          </div>
+        </div>
+      </div>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Progreso semanal</h3>
+          <div class="progress"><div id="weeklyProgress"></div></div>
+          <div class="row">
+            <span class="tag">PP: <span id="pp" class="kpi">0</span>/200</span>
+            <span class="tag">Monedas: <span id="coins" class="kpi">0</span></span>
+            <span class="tag">Racha: <span id="streak" class="kpi">0</span> días</span>
+          </div>
+          <div class="row">
+            <button class="btn" data-route="training">Empezar entrenamiento</button>
+            <button class="btn secondary" data-route="missions">Ir a misiones</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Consejo del Mentor</h3>
+          <p class="muted small" id="mentorTip">“Pequeños pasos, grandes logros. Hoy, 15 minutos bastan.”</p>
+          <div class="row">
+            <button class="btn" id="btnRandomTip">Nuevo consejo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ONBOARDING -->
+    <section id="onboarding" class="card hidden">
+      <h2>Onboarding rápido (2 pasos)</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>1) ¿Cómo te llamás?</h3>
+          <input id="inpName" placeholder="Nombre del Aprendiz" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid #30375f;background:#0f1220;color:#fff">
+        </div>
+        <div class="card">
+          <h3>2) Elegí tu avatar</h3>
+          <div class="row">
+            <button class="btn secondary" data-avatar="🙂">🙂</button>
+            <button class="btn secondary" data-avatar="🧝‍♀️">🧝‍♀️</button>
+            <button class="btn secondary" data-avatar="🛡️">🛡️</button>
+            <button class="btn secondary" data-avatar="🧙">🧙</button>
+            <button class="btn secondary" data-avatar="🐉">🐉</button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <button class="btn" id="btnSaveOnb">Guardar y continuar</button>
+      </div>
+    </section>
+
+    <!-- TRAINING -->
+    <section id="training" class="card hidden">
+      <div class="spaced">
+        <h2>Entrenamiento · Enfoque</h2>
+        <span class="pill">Completar sesiones suma PP y monedas</span>
+      </div>
+      <div class="row">
+        <button class="btn secondary timeOpt" data-min="15">15 min</button>
+        <button class="btn secondary timeOpt" data-min="25">25 min</button>
+        <button class="btn secondary timeOpt" data-min="45">45 min</button>
+      </div>
+      <div class="card">
+        <div class="timer mono" id="timer">00:00</div>
+        <div class="row">
+          <button class="btn" id="btnStart">Iniciar</button>
+          <button class="btn ghost" id="btnStop">Detener</button>
+          <button class="btn secondary" id="btnComplete">Marcar como completado</button>
+        </div>
+        <p class="muted small">Tip: si detenés antes de tiempo, ganás menos PP y monedas.</p>
+      </div>
+    </section>
+
+    <!-- MISSIONS -->
+    <section id="missions" class="card hidden">
+      <div class="spaced">
+        <h2>Tablero de Misiones</h2>
+        <span class="pill">Reino: Lengua & Matemáticas</span>
+      </div>
+      <div class="list" id="missionList"></div>
+      <div class="row">
+        <button class="btn" id="btnAddMission">Añadir misión</button>
+      </div>
+    </section>
+
+    <!-- PREP BOSS -->
+    <section id="prep" class="card hidden">
+      <div class="spaced">
+        <h2>Preparación de Boss</h2>
+        <span class="pill">Meta PP semanal: 200</span>
+      </div>
+      <div class="progress"><div id="ppBar"></div></div>
+      <p class="muted small">Acciones que suman: completar entrenamiento (+20), completar misión (+30), repasar (+10).</p>
+      <div class="row">
+        <button class="btn" id="btnAddPP20">+20 Entrenamiento</button>
+        <button class="btn" id="btnAddPP30">+30 Misión</button>
+        <button class="btn" id="btnAddPP10">+10 Repaso</button>
+      </div>
+    </section>
+
+    <!-- BOSS -->
+    <section id="boss" class="card hidden">
+      <h2>Boss simbólico: Quiz rápido</h2>
+      <ol id="quizList" class="list"></ol>
+      <div class="row">
+        <button class="btn" id="btnSubmitQuiz">Entregar</button>
+      </div>
+      <p id="quizResult" class="muted"></p>
+    </section>
+
+    <!-- CAMPFIRE -->
+    <section id="campfire" class="card hidden">
+      <h2>Fogata semanal 🔥</h2>
+      <p class="muted">Celebrá tu progreso: esfuerzo, logro y aprendizaje nuevo.</p>
+      <div class="grid cols-2">
+        <div class="card">
+          <h3>Resumen</h3>
+          <ul class="small muted">
+            <li>Sesiones completadas: <strong id="sumSessions">0</strong></li>
+            <li>Misiones completadas: <strong id="sumMissions">0</strong></li>
+            <li>PP acumulados: <strong id="sumPP">0</strong></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Bitácora</h3>
+          <textarea id="logText" rows="6" placeholder="¿Qué aprendiste esta semana?" style="width:100%;padding:.8rem;border-radius:12px;border:1px solid #30375f;background:#0f1220;color:#fff"></textarea>
+          <div class="row" style="margin-top:.6rem">
+            <button class="btn" id="btnSaveLog">Guardar</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STORE -->
+    <section id="store" class="card hidden">
+      <h2>Tienda (cosmética/privilegios)</h2>
+      <div class="list" id="storeList"></div>
+    </section>
+  </main>
+
+  <script>
+  // ======= Estado simple (localStorage) =======
+  const state = {
+    name: localStorage.getItem('eh_name') || 'Sin nombre',
+    avatar: localStorage.getItem('eh_avatar') || '🙂',
+    coins: parseInt(localStorage.getItem('eh_coins') || '0', 10),
+    pp: parseInt(localStorage.getItem('eh_pp') || '0', 10),
+    streak: parseInt(localStorage.getItem('eh_streak') || '0', 10),
+    sessions: parseInt(localStorage.getItem('eh_sessions') || '0', 10),
+    missions: JSON.parse(localStorage.getItem('eh_missions') || '[]'),
+    log: localStorage.getItem('eh_log') || '',
+    timerMin: 15,
+    quizAnswers: {}
+  };
+
+  const sel = id => document.getElementById(id);
+  const routeBtns = document.querySelectorAll('[data-route]');
+  const sections = ['home','onboarding','training','missions','prep','boss','campfire','store'];
+
+  function go(route){
+    sections.forEach(id => sel(id).classList.add('hidden'));
+    sel(route).classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+    render();
+  }
+  routeBtns.forEach(b=>b.addEventListener('click',()=>go(b.dataset.route)));
+
+  // ======= Render básico =======
+  function save(){
+    localStorage.setItem('eh_name', state.name);
+    localStorage.setItem('eh_avatar', state.avatar);
+    localStorage.setItem('eh_coins', state.coins);
+    localStorage.setItem('eh_pp', state.pp);
+    localStorage.setItem('eh_streak', state.streak);
+    localStorage.setItem('eh_sessions', state.sessions);
+    localStorage.setItem('eh_missions', JSON.stringify(state.missions));
+    localStorage.setItem('eh_log', state.log);
+  }
+
+  function renderHome(){
+    sel('studentName').textContent = state.name;
+    sel('avatar').textContent = state.avatar;
+    sel('coins').textContent = state.coins;
+    sel('pp').textContent = state.pp;
+    sel('streak').textContent = state.streak;
+    const pct = Math.min(100, Math.round((state.pp/200)*100));
+    sel('weeklyProgress').style.width = pct + '%';
+  }
+
+  function renderMissions(){
+    const list = sel('missionList');
+    list.innerHTML = '';
+    if(state.missions.length===0){
+      state.missions = [
+        {id:1, title:'Leer 10 minutos', done:false, reward:{coins:10, pp:30}},
+        {id:2, title:'Resolver 5 sumas', done:false, reward:{coins:10, pp:30}},
+        {id:3, title:'Escribir 3 oraciones', done:false, reward:{coins:10, pp:30}},
+      ];
+      save();
+    }
+    state.missions.forEach(m=>{
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.innerHTML = `
+        <span>${m.title}</span>
+        <span class="row">
+          <span class="tag">+${m.reward.coins}💰 +${m.reward.pp}PP</span>
+          <input type="checkbox" class="checkbox" ${m.done?'checked':''} aria-label="completar">
+        </span>`;
+      el.querySelector('input').addEventListener('change', (e)=>{
+        if(!m.done && e.target.checked){
+          m.done = true;
+          state.coins += m.reward.coins;
+          state.pp += m.reward.pp;
+          save(); render();
+        }else if(m.done && !e.target.checked){
+          m.done = false;
+          state.coins -= m.reward.coins;
+          state.pp -= m.reward.pp;
+          save(); render();
+        }
+      });
+      list.appendChild(el);
+    });
+  }
+
+  function renderPrep(){
+    const pct = Math.min(100, Math.round((state.pp/200)*100));
+    sel('ppBar').style.width = pct + '%';
+  }
+
+  function renderCampfire(){
+    sel('sumSessions').textContent = state.sessions;
+    const completed = state.missions.filter(m=>m.done).length;
+    sel('sumMissions').textContent = completed;
+    sel('sumPP').textContent = state.pp;
+    sel('logText').value = state.log;
+  }
+
+  function renderStore(){
+    const items = [
+      {id:'skin1', name:'Capa del Aprendiz', price:30, img:'', desc:'Cosmético visual'},
+      {id:'perk1', name:'Elegir Misión', price:40, img:'', desc:'Privilegio de orden'},
+      {id:'emoji', name:'Emote Fogata', price:20, img:'', desc:'Animación en recap'}
+    ];
+    const list = sel('storeList'); list.innerHTML='';
+    items.forEach(it=>{
+      const el = document.createElement('div');
+      el.className='store-item';
+      el.innerHTML = `
+        <img alt="" />
+        <div style="flex:1">
+          <strong>${it.name}</strong><div class="muted small">${it.desc}</div>
+        </div>
+        <button class="btn ghost" data-buy="${it.id}">Comprar ${it.price}💰</button>`;
+      el.querySelector('button').addEventListener('click',()=>{
+        if(state.coins>=it.price){
+          state.coins -= it.price; save(); render();
+          alert('¡Comprado! (simulado)');
+        }else{ alert('Monedas insuficientes'); }
+      });
+      list.appendChild(el);
+    });
+  }
+
+  function renderQuiz(){
+    const qs = [
+      {q:'2 + 2 = ?', opts:['3','4','5'], a:1},
+      {q:'Seleccioná la vocal', opts:['b','a','k'], a:1},
+      {q:'5 - 3 = ?', opts:['1','2','3'], a:1},
+      {q:'¿Cuál es un sustantivo?', opts:['correr','mesa','rápido'], a:1},
+      {q:'10 ÷ 2 = ?', opts:['4','5','6'], a:1},
+    ];
+    const list = sel('quizList'); list.innerHTML='';
+    qs.forEach((item,idx)=>{
+      const li = document.createElement('li'); li.className='item'; li.style.flexDirection='column'; li.style.alignItems='flex-start';
+      const opts = item.opts.map((o,i)=>`<label class="row small"><input type="radio" name="q${idx}" value="${i}"> ${o}</label>`).join('');
+      li.innerHTML = `<div><strong>${item.q}</strong></div><div class="grid">${opts}</div>`;
+      list.appendChild(li);
+    });
+    document.getElementById('btnSubmitQuiz').onclick = ()=>{
+      let score=0;
+      qs.forEach((item,idx)=>{
+        const selOpt = document.querySelector(`input[name="q${idx}"]:checked`);
+        if(selOpt && parseInt(selOpt.value,10)===item.a) score++;
+      });
+      sel('quizResult').textContent = `Resultados: ${score}/5. ${score>=4?'¡Victoria!':'Derrota parcial, intentá el plan de refuerzo.'}`;
+      // recompensa simbólica
+      if(score>=4){ state.coins += 50; state.pp += 40; } else { state.pp += 10; }
+      save(); render();
+    };
+  }
+
+  function render(){
+    renderHome();
+    renderMissions();
+    renderPrep();
+    renderCampfire();
+    renderStore();
+    renderQuiz();
+  }
+
+  // ======= Onboarding events =======
+  document.querySelectorAll('[data-avatar]').forEach(b=>b.addEventListener('click',()=>{
+    state.avatar = b.getAttribute('data-avatar'); save(); render();
+  }));
+  sel('btnSaveOnb').addEventListener('click',()=>{
+    const name = sel('inpName').value.trim();
+    if(name){ state.name = name; save(); go('home'); } else { alert('Decinos tu nombre :)'); }
+  });
+
+  // ======= Training timer (simple) =======
+  let interval=null, remaining=0;
+  document.querySelectorAll('.timeOpt').forEach(b=>b.addEventListener('click',()=>{
+    state.timerMin = parseInt(b.dataset.min,10); document.querySelectorAll('.timeOpt').forEach(x=>x.classList.remove('btn')); b.classList.add('btn'); b.classList.remove('secondary');
+  }));
+  function fmt(s){const m=Math.floor(s/60), ss=String(s%60).padStart(2,'0'); return String(m).padStart(2,'0')+':'+ss;}
+  function tick(){ if(remaining>0){ remaining--; sel('timer').textContent=fmt(remaining); } else { clearInterval(interval); interval=null; alert('¡Sesión completada! +15💰 +20PP'); state.coins+=15; state.pp+=20; state.sessions++; state.streak = Math.min(7, state.streak+1); save(); render(); } }
+  sel('btnStart').addEventListener('click',()=>{
+    if(interval) return; remaining = state.timerMin*60; sel('timer').textContent=fmt(remaining); interval=setInterval(tick,1000);
+  });
+  sel('btnStop').addEventListener('click',()=>{ if(interval){ clearInterval(interval); interval=null; alert('Sesión detenida. +5💰 +5PP'); state.coins+=5; state.pp+=5; save(); render(); }});
+  sel('btnComplete').addEventListener('click',()=>{ if(interval){ clearInterval(interval); interval=null; } alert('Marcada como completada. +10💰 +15PP'); state.coins+=10; state.pp+=15; state.sessions++; save(); render(); });
+
+  // ======= Prep buttons =======
+  sel('btnAddPP20').addEventListener('click',()=>{ state.pp+=20; save(); render(); });
+  sel('btnAddPP30').addEventListener('click',()=>{ state.pp+=30; save(); render(); });
+  sel('btnAddPP10').addEventListener('click',()=>{ state.pp+=10; save(); render(); });
+
+  // ======= Missions add =======
+  sel('btnAddMission').addEventListener('click',()=>{
+    const title = prompt('Título de la misión:');
+    if(title){
+      const id = Date.now();
+      state.missions.push({id, title, done:false, reward:{coins:10, pp:30}});
+      save(); render();
+    }
+  });
+
+  // ======= Mentor tips =======
+  const tips=['“Pequeños pasos, grandes logros.”','“Respirá 10 segundos y arrancá.”','“Hoy vale más terminar que perfeccionar.”','“Corta en minitareas de 5 minutos.”','“Pedí una pista, no la respuesta.”'];
+  sel('btnRandomTip').addEventListener('click',()=>{
+    sel('mentorTip').textContent = tips[Math.floor(Math.random()*tips.length)];
+  });
+
+  // ======= Campfire save =======
+  sel('btnSaveLog').addEventListener('click',()=>{
+    state.log = sel('logText').value; save(); alert('Bitácora guardada.');
+  });
+
+  // Init
+  render(); go('home');
+  </script>
+</body>
+</html>
